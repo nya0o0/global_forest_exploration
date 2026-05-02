@@ -9,6 +9,7 @@ An interactive Shiny app that walks through the global pattern of forest tree-co
 ## 🚀Run the app
 
 ``` r
+
 # Install dependencies once
 install.packages(c("shiny", "bslib", "dplyr", "tidyr", "readr",
                    "ggplot2", "plotly", "scales", "viridis",
@@ -23,6 +24,7 @@ install.packages("rnaturalearthhires",
                            "https://cloud.r-project.org"))
 
 # Run directly from GitHub
+
 shiny::runGitHub("global_forest_exploration", "<nya0o0>", ref = "main")
 ```
 
@@ -67,7 +69,7 @@ The upstream observations are produced by **satellite remote sensing**, not surv
 ### Files
 
 | File | Unit of analysis | Years | Key columns |
-|------------------|------------------|------------------|------------------|
+|----|----|----|----|
 | `Country-tree-cover-loss.csv` | country × threshold | 2001–2022 | `tc_loss_ha_<year>`, `extent_2000_ha`, `gain_2000–2020_ha` |
 | `Country-carbon-data.csv` | country × threshold | 2001–2022 + averages | `gross_emissions_<year>`, `gross_removals`, `net_flux`, `aboveground_carbon_stocks_2000` |
 | `Subnational-1-tree-cover-loss.csv` | country × admin-1 × threshold | 2001–2022 | same as country, plus `subnational1` |
@@ -136,7 +138,7 @@ forest-loss-shiny/
 ## 4. Team
 
 | \# | Member | Module | Cross-cutting role |
-|------------------|------------------|------------------|------------------|
+|----|----|----|----|
 | 1 | CHEN, Yanyu | Ch.1 Overview | Repo lead · Git workflow · final integration |
 | 2 | CHEN, Hongxing | Ch.2 Trends | Data engineer (`prep_data.R`) |
 | 3 | WING, Yui Yan | Ch.3 Loss ↔ Carbon | Narrative writer (Intro page + insights) |

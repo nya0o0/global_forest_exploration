@@ -7,7 +7,8 @@
 # Run automatically by app.R on first launch, or manually:
 #     source("data-raw/prep_data.R")
 #
-# Owner: Member B (data engineer)
+
+# Owner: CHEN Hongxing
 # ============================================================================
 
 suppressPackageStartupMessages({
