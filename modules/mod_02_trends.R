@@ -3,9 +3,7 @@
 # Question: How has loss in key countries evolved 2001–2022?
 # ============================================================================
 
-# ============================================================================
-# Module 2 — Time trends (multi-country line chart) - FINAL VERSION
-# ============================================================================
+
 mod_02_trends_ui <- function(id) {
   ns <- NS(id)
   fluidPage(
@@ -156,24 +154,22 @@ mod_02_trends_server <- function(id, country_loss) {
           axis.text.x = element_text(margin = margin(t = 8), color = "grey60"),
           axis.title.y = element_text(color = "#4b5563", size = 12),
           axis.text.y = element_text(color = "grey60", size = 12),
-          # 移除 ggplot 标题边距（因为改用 plotly layout 控制）
           plot.title = element_text(size = 17, face = "bold", hjust = 0.5, color = '#2d8f6c'),
           legend.position = "bottom",
           legend.margin = margin(t = 12)
         )
       
-      # 转换为 plotly 并手动控制标题位置
+      # plotly ;  Control Title Position
       p <- to_plotly(g, tooltip = "text") %>%
         layout(
           title = list(
             text = "Annual Tree-Cover Loss by Country",
-            x = 0.5,                # 水平居中
-            xanchor = "center",     # 锚点居中
-            y = 0.98,               # 垂直位置（0~1，越小越靠下，默认约0.98）
-            yanchor = "top",        # 锚点顶部，配合 y 使用
+            x = 0.5,                
+            xanchor = "center",     
+            y = 0.98,               
+            yanchor = "top",        
             font = list(color = "#2d8f6c", size = 25, family = "sans-serif")
           ),
-          # 确保图例没有标题
           legend = list(title = list(text = ""))
         )
       
