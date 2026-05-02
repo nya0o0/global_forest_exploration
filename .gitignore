@@ -1,5 +1,23 @@
-.Rproj.user
+# R
+.Rproj.user/
 .Rhistory
 .RData
 .Ruserdata
+*.Rproj
+
+# Generated data (regenerable from prep_data.R)
+data/*.rds
+
+# IDE / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Shiny
+rsconnect/
+
+# logs / secrets
+*.log
+.env
 .positai
