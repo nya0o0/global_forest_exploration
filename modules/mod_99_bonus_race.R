@@ -12,7 +12,7 @@ mod_99_bonus_race_ui <- function(id) {
     ),
     sidebarLayout(
       sidebarPanel(width = 3,
-        selectInput(ns("threshold"), "Threshold",
+        selectInput(ns("threshold"), threshold_label("Threshold"),
                     choices = THRESHOLD_CHOICES, selected = DEFAULT_THRESHOLD),
         sliderInput(ns("topn"), "Top N", min = 5, max = 15, value = 10),
         actionButton(ns("render"), "Render animation", class = "btn-primary"),

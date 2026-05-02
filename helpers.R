@@ -85,3 +85,75 @@ module_header <- function(chapter, title, subtitle) {
       tags$h2(title),
       tags$p(class = "lead", subtitle))
 }
+
+#' Threshold label with an info-icon popover explaining what the
+#' tree-cover density threshold actually means. Used as the `label`
+#' argument of selectInput in every module that exposes the threshold.
+threshold_label <- function(text = "Tree-cover density threshold") {
+  tags$span(
+    text, " ",
+    tags$a(
+      href      = "#",
+      tabindex  = "0",
+      class     = "threshold-info",
+      role      = "button",
+      `data-bs-toggle`   = "popover",
+      `data-bs-trigger`  = "focus hover",
+      `data-bs-html`     = "true",
+      `data-bs-placement`= "right",
+      `data-bs-title`    = "What is this threshold?",
+      `data-bs-content`  = paste0(
+        "<p>The minimum percentage of tree-canopy cover (per 30 m Landsat ",
+        "pixel) that counts as <b>forest</b>.</p>",
+        "<ul style='padding-left:1rem;margin-bottom:.4rem;'>",
+        "<li><b>10 %</b> \u2014 loose: includes savanna &amp; shrubs</li>",
+        "<li><b>30 %</b> \u2014 FAO international standard (default)</li>",
+        "<li><b>75 %</b> \u2014 strict: dense / primary forest only</li>",
+        "</ul>",
+        "<small>Lower thresholds inflate forest area &amp; loss numbers; ",
+        "higher thresholds focus on intact forest.</small>"),
+      tags$i(class = "fa fa-info-circle",
+             style = "color:#1f6f54; cursor:pointer;")
+    )
+  )
+}
+
+#' Activate Bootstrap 5 popovers everywhere in the app. Uses a
+#' MutationObserver so popovers in lazily-rendered tab content also
+#' get initialised the moment Shiny inserts them into the DOM.
+threshold_popover_init <- function() {
+  tagList(
+    tags$script(HTML(
+      "(function(){
+         function scan(root){
+           if (typeof bootstrap === 'undefined') return;
+           var els = (root||document).querySelectorAll('[data-bs-toggle=\"popover\"]');
+           els.forEach(function(el){
+             if (!el._initd){
+               try { bootstrap.Popover.getOrCreateInstance(el); el._initd = true; } catch(e){}
+             }
+           });
+         }
+         function start(){
+           scan(document);
+           var mo = new MutationObserver(function(muts){
+             muts.forEach(function(m){
+               m.addedNodes.forEach(function(n){
+                 if (n.nodeType === 1) scan(n);
+               });
+             });
+           });
+           mo.observe(document.body, {childList:true, subtree:true});
+           // Belt-and-braces: re-scan on common Shiny / Bootstrap events
+           document.addEventListener('shown.bs.tab', function(){ scan(document); });
+           if (window.$) {
+             $(document).on('shiny:value shiny:bound shiny:connected', function(){ scan(document); });
+           }
+         }
+         if (document.readyState === 'loading'){
+           document.addEventListener('DOMContentLoaded', start);
+         } else { start(); }
+       })();"
+    ))
+  )
+}

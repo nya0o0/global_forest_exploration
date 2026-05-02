@@ -53,7 +53,10 @@ ui <- navbarPage(
   id = "main_nav",
   title = tags$span("🌳 Forest Loss & Carbon (2001–2022)"),
   theme = bs_theme(version = 5, bootswatch = "flatly", primary = "#1f6f54"),
-  header = tags$head(tags$link(rel = "stylesheet", href = "custom.css")),
+  header = tagList(
+    tags$head(tags$link(rel = "stylesheet", href = "custom.css")),
+    threshold_popover_init()
+  ),
 
   tabPanel("Intro", icon = icon("leaf"),
     fluidRow(column(8, offset = 2,
@@ -63,6 +66,12 @@ ui <- navbarPage(
         "This app walks you through five chapters: from the global ranking, through the",
         "loss–carbon relationship, down to subnational hotspots, ending with the question",
         "that matters most for climate — are forests still a net carbon sink?"),
+
+      # Always-visible data-source section (re-uses www/data-source.md)
+      tags$hr(),
+      div(class = "data-source-body",
+          includeMarkdown("www/data-source.md")),
+
       tags$hr(),
       tags$h4("How to read this app"),
       tags$ol(
@@ -73,6 +82,14 @@ ui <- navbarPage(
         tags$li(tags$b("5 · Carbon budget "),"— sink or source?"),
         tags$li(tags$em("Bonus — animated 20-year ranking race"))
       ),
+      tags$p(class = "text-muted",
+        tags$i(class = "fa fa-info-circle"), " ",
+        tags$b("Tree-cover density threshold:"),
+        " the minimum % of canopy cover per 30 m pixel that counts as forest. ",
+        "10 % = loose (savanna/shrubs), 30 % = FAO standard (default), 75 % = strict primary forest. ",
+        "Hover the ", tags$i(class = "fa fa-info-circle"), " icon next to any threshold control for details."),
+
+      tags$br(),
       actionButton("go_ch1", "Start →", class = "btn-primary btn-lg")
     ))
   ),
@@ -87,7 +104,7 @@ ui <- navbarPage(
            fluidRow(column(8, offset = 2, includeMarkdown("www/about.md")))),
 
   footer = tags$footer(class = "app-footer",
-    HTML("Source: <a href='https://www.globalforestwatch.org' target='_blank'>Global Forest Watch</a> · Hansen et al. (2013) · Harris et al. (2021). CC BY 4.0."),
+    HTML("Source: <a href='https://www.kaggle.com/datasets/karnikakapoor/global-forest-data-2001-2022' target='_blank'>Global Forest Data: 2001–2022</a> (Kaggle, mirroring <a href='https://www.globalforestwatch.org' target='_blank'>Global Forest Watch</a>) · Hansen et al. (2013) · Harris et al. (2021). CC BY 4.0."),
     tags$div("Built for DASC 3240 · 2025/26 Spring · HKUST"))
 )
 

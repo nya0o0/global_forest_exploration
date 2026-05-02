@@ -86,6 +86,7 @@ mod_02_trends_server <- function(id, country_loss) {
         group_by(country) %>%
         summarise(total = sum(tc_loss_ha, na.rm = TRUE)) %>%
         slice_max(total, n = 5) %>% pull(country)
+
       
       updateSelectizeInput(session, "countries",
                            choices = all_countries,
@@ -177,3 +178,4 @@ mod_02_trends_server <- function(id, country_loss) {
     })
   })
 }
+

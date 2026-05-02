@@ -15,7 +15,7 @@ mod_03_loss_carbon_ui <- function(id) {
       sidebarPanel(width = 3,
         sliderInput(ns("year"), "Year",
                     min = 2001, max = 2022, value = 2020, step = 1, sep = ""),
-        selectInput(ns("threshold"), "Threshold",
+        selectInput(ns("threshold"), threshold_label("Threshold"),
                     choices = THRESHOLD_CHOICES, selected = DEFAULT_THRESHOLD),
         radioButtons(ns("metric"), "Carbon metric (y-axis)",
                      choices = CARBON_METRICS, selected = "gross_emissions"),

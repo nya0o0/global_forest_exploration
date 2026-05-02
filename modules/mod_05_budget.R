@@ -16,7 +16,7 @@ mod_05_budget_ui <- function(id) {
         sidebarLayout(
           sidebarPanel(width = 3,
             selectInput(ns("country"), "Country", choices = NULL),
-            selectInput(ns("threshold"), "Threshold",
+            selectInput(ns("threshold"), threshold_label("Threshold"),
                         choices = THRESHOLD_CHOICES, selected = DEFAULT_THRESHOLD),
             helpText("Removals are reported as a single annual average ",
                      "(data limitation), shown as a constant baseline.")
@@ -30,7 +30,7 @@ mod_05_budget_ui <- function(id) {
             sliderInput(ns("yrs"), "Average over years",
                         min = 2001, max = 2022, value = c(2018, 2022),
                         step = 1, sep = ""),
-            selectInput(ns("threshold2"), "Threshold",
+            selectInput(ns("threshold2"), threshold_label("Threshold"),
                         choices = THRESHOLD_CHOICES, selected = DEFAULT_THRESHOLD),
             sliderInput(ns("topn"), "Top N",
                         min = 5, max = 30, value = 15)
