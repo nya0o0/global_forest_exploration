@@ -129,7 +129,6 @@ mod_01_overview_server <- function(id, country_loss) {
     
     # Top chart: yearly ranking (existing logic)
     # Defines a reactive expression top_df that filters/aggregates country_loss via top_countries_loss() for the selected year, threshold, and top‑N.
->>>>>>> main
     top_df <- reactive({
       top_countries_loss(country_loss,
                          year_sel      = input$year,
