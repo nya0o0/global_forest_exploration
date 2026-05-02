@@ -6,7 +6,7 @@ An interactive Shiny app that walks through the global pattern of forest tree-co
 
 ------------------------------------------------------------------------
 
-## 🚀 Run the app (one-liner)
+## 🚀Run the app
 
 ``` r
 # Install dependencies once
@@ -23,34 +23,8 @@ install.packages("rnaturalearthhires",
                            "https://cloud.r-project.org"))
 
 # Run directly from GitHub
-shiny::runGitHub("forest-loss-shiny", "<your-org-or-user>", ref = "main")
+shiny::runGitHub("global_forest_exploration", "<nya0o0>", ref = "main")
 ```
-
-### System libraries (Linux only)
-
-On Debian/Ubuntu the spatial stack and a few build tools are required:
-
-``` bash
-sudo apt-get install -y libgdal-dev libproj-dev libudunits2-dev libgeos-dev \
-                        libabsl-dev cmake cargo rustc libuv1-dev
-```
-
-On macOS / Windows the binary CRAN packages already include these libraries — no extra steps needed.
-
-To run locally:
-
-``` bash
-git clone https://github.com/<your-org-or-user>/forest-loss-shiny.git
-cd forest-loss-shiny
-```
-
-``` r
-shiny::runApp(".")
-```
-
-The first launch runs `data-raw/prep_data.R` automatically (\~30 s) to build the cached `.rds` files in `data/`.
-
-------------------------------------------------------------------------
 
 ## 1. Research question
 
