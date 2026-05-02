@@ -34,9 +34,11 @@ mod_04_hotspots_ui <- function(id) {
                   column(6, plotlyOutput(ns("top_rank"), height = "260px")),
                   column(6, plotlyOutput(ns("region_ts"), height = "260px"))),
                 insight_box("Insight",
-                            "Hotspots cluster heavily in Canada, Russia and Amazon. Notice how switching from absolute 'Tree-cover loss (ha)' 
-                            to relative 'Loss rate (%)' shifts the spotlight: some smaller provinces are being deforested at alarming speeds relative to 
-                            their baseline size, pushing their carbon flux deep into 'Net Source' territory.")
+                            HTML("Hotspots cluster heavily in Russia (Sakha, Krasnoyarsk, Irkutsk), Brazil (Para, Mato Grosso, Santa Cruz, Amazonas), 
+                            Canada (Saskatchewan, Alberta, British Columbia), and US (Alaska).<br>
+                            Notice how switching from absolute 'Tree-cover loss (ha)' to relative 'Loss rate (%)' 
+                                 shifts the spotlight: some smaller provinces are being deforested at alarming speeds relative to 
+                                 their baseline size, pushing their carbon flux deep into 'Net Source' territory."))
       )
     )
   )
