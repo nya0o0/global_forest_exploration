@@ -1,5 +1,5 @@
 # ============================================================================
-# Module 2 — Time trends (multi-country line chart)          Owner: Member B
+# Module 2 — Time trends (multi-country line chart)          Owner: CHEN Hongxing
 # Question: How has loss in key countries evolved 2001–2022?
 # ============================================================================
 
