@@ -161,8 +161,6 @@ forest-loss-shiny/
 
 ## 4. Team
 
-See [`docs/division-of-labour.md`](docs/division-of-labour.md).
-
 | \# | Member | Module | Cross-cutting role |
 |------------------|------------------|------------------|------------------|
 | 1 | CHEN, Yanyu | Ch.1 Overview | Repo lead · Git workflow · final integration |
