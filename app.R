@@ -75,9 +75,9 @@ ui <- navbarPage(
       tags$hr(),
       tags$h4("How to read this app"),
       tags$ol(
-        tags$li(tags$b("1 · Overview "),     "— who loses the most?"),
-        tags$li(tags$b("2 · Time trends "),  "— turning points 2001–2022"),
-        tags$li(tags$b("3 · Loss ↔ Carbon "),"— is loss correlated with emissions?"),
+        tags$li(tags$b("1 · Overview "),     "— Where is the world losing its forests?"),
+        tags$li(tags$b("2 · Time trends "),  "— World Forest Loss Trajectories, 2001 – 2022"),
+        tags$li(tags$b("3 · Loss ↔ Carbon "),"— Is loss correlated with emissions?"),
         tags$li(tags$b("4 · Hotspots "),     "— zoom into subnational regions"),
         tags$li(tags$b("5 · Carbon budget "),"— sink or source?"),
         tags$li(tags$em("Bonus — animated 20-year ranking race"))
