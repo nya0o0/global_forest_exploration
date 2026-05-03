@@ -11,7 +11,7 @@ mod_05_budget_ui <- function(id) {
       title    = "Sink or source? The carbon budget verdict",
       subtitle = "Net flux = gross emissions − gross removals. Positive values mean the forest system is a net source of carbon."
     ),
-    tabsetPanel(type = "pills",
+    tabsetPanel(id = ns("budget_tab"), type = "pills",
       tabPanel("Single country",
         sidebarLayout(
           sidebarPanel(width = 3,
@@ -39,7 +39,12 @@ mod_05_budget_ui <- function(id) {
         )
       )
     ),
-    insight_box("Insight",
+    conditionalPanel(
+      condition = "input.budget_tab == 'Single country'",
+      ns = ns,
+      insight_box("Real-time Insight", textOutput(ns("dynamic_insight")))
+    ),
+    insight_box("Key Insight",
       "Several tropical countries — notably Brazil and Indonesia — have shifted from net sinks to net sources in recent years, driven by record-breaking loss and fires. Large boreal countries (Russia, Canada) and reforesting nations (China, India) remain strong net sinks. The global forest balance is still negative (a net sink), but tropical erosion is steadily narrowing the margin."
     )
   )
@@ -75,9 +80,31 @@ mod_05_budget_server <- function(id, country_carbon, country_joined) {
                                        "Net flux" = "#0072B2")) +
         labs(title = paste0(input$country, " — forest carbon budget"),
              subtitle = "Mg CO₂e per year",
-             x = NULL, y = NULL, colour = NULL) +
+             x = NULL, y = NULL, colour = NULL,
+             caption = "Note: Gross removals are reported as a single annual average (2001–2022) in the source data, shown as a constant baseline.") +
         plot_theme()
       to_plotly(g)
+    })
+
+    output$dynamic_insight <- renderText({
+      req(input$country)
+      thr <- as.integer(input$threshold)
+      d <- country_joined %>%
+        filter(country == input$country,
+               threshold == thr,
+               year >= 2018, year <= 2022) %>%
+        mutate(net = gross_emissions - gross_removals)
+
+      mean_net <- mean(d$net, na.rm = TRUE)
+      req(is.finite(mean_net))
+
+      if (mean_net > 0) {
+        paste0(input$country,
+               " has become a net carbon source over the past five years (2018-2022), and its forest ecosystem is now a net CO2 emitter.")
+      } else {
+        paste0(input$country,
+               " has remained a net carbon sink over the past five years (2018-2022), and its forest ecosystem is still a net CO2 absorber.")
+      }
     })
 
     output$rank_plot <- renderPlotly({
