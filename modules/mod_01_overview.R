@@ -12,16 +12,22 @@ mod_01_overview_ui <- function(id) {
     # Create side bar
     sidebarLayout(
       sidebarPanel(width = 3,
-                   sliderInput(ns("year"), "Year",
+                   sidebar_title("Year"),
+                   sliderInput(ns("year"), label = NULL,
                                min = 2001, max = 2022, value = 2022, step = 1, sep = "",
-                               animate = animationOptions(interval = 800, loop = FALSE)), # Year slider
-                   selectInput(ns("threshold"), threshold_label("Tree-cover density threshold"),
-                               choices = THRESHOLD_CHOICES, selected = DEFAULT_THRESHOLD), # A dropdown to choose tree-cover density threshold
-                   sliderInput(ns("topn"), "Top N countries",
-                               min = 5, max = 25, value = 10, step = 1), # Top N slider
-                   helpText("Tip: drag the year slider or hit play to scan 2001\u20132022, choose your preferred tree-cover density threshold and the number of top countries you want to see."),
+                               animate = animationOptions(interval = 800, loop = FALSE)),
+
+                   threshold_sidebar_title("Tree-cover density threshold"),
+                   selectInput(ns("threshold"), label = NULL,
+                               choices = THRESHOLD_CHOICES, selected = DEFAULT_THRESHOLD),
+
+                   sidebar_title("Top N countries"),
+                   sliderInput(ns("topn"), label = NULL,
+                               min = 5, max = 25, value = 10, step = 1),
+
                    tags$hr(),
-                   downloadButton(ns("download"), "Download data shown") # Down load button
+                   helpText("Tip: drag the year slider or hit play to scan 2001\u20132022, choose your preferred tree-cover density threshold and the number of top countries you want to see."),
+                   downloadButton(ns("download"), "Download data shown")
       ),
       # Create the main panel
       mainPanel(width = 9,

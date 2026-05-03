@@ -12,9 +12,14 @@ mod_99_bonus_race_ui <- function(id) {
     ),
     sidebarLayout(
       sidebarPanel(width = 3,
-        selectInput(ns("threshold"), threshold_label("Threshold"),
+        threshold_sidebar_title("Threshold"),
+        selectInput(ns("threshold"), label = NULL,
                     choices = THRESHOLD_CHOICES, selected = DEFAULT_THRESHOLD),
-        sliderInput(ns("topn"), "Top N", min = 5, max = 15, value = 10),
+
+        sidebar_title("Top N"),
+        sliderInput(ns("topn"), label = NULL, min = 5, max = 15, value = 10),
+
+        tags$hr(),
         actionButton(ns("render"), "Render animation", class = "btn-primary"),
         helpText("Rendering takes ~10 seconds.")
       ),

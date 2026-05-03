@@ -118,6 +118,19 @@ threshold_label <- function(text = "Tree-cover density threshold") {
   )
 }
 
+#' Render a green sidebar section title (used in every module's
+#' sidebarPanel for visual consistency). Pair with `label = NULL` on
+#' the input below.
+sidebar_title <- function(text) {
+  tags$div(class = "sidebar-title", text)
+}
+
+#' Same as sidebar_title() but with the threshold info icon appended.
+#' Use above any selectInput that controls the canopy-cover threshold.
+threshold_sidebar_title <- function(text = "Threshold") {
+  tags$div(class = "sidebar-title", threshold_label(text))
+}
+
 #' Activate Bootstrap 5 popovers everywhere in the app. Uses a
 #' MutationObserver so popovers in lazily-rendered tab content also
 #' get initialised the moment Shiny inserts them into the DOM.

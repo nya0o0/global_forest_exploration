@@ -14,7 +14,7 @@ mod_02_trends_ui <- function(id) {
     ),
     sidebarLayout(
       sidebarPanel(width = 3,
-                   tags$div(class = "sidebar-title", "Select countries/regions"),
+                   sidebar_title("Select countries/regions"),
                    selectizeInput(ns("countries"), label = NULL,
                                   choices = NULL,
                                   multiple = TRUE,
@@ -23,14 +23,14 @@ mod_02_trends_ui <- function(id) {
                                     placeholder = "Search and select..."
                                   )),
                    
-                   tags$div(class = "sidebar-title", "Year range"),
+                   sidebar_title("Year range"),
                    sliderInput(ns("years"), label = NULL,
                                min = 2001, max = 2022,
                                value = c(2001, 2022), step = 1, sep = ""),
                    
-                   tags$div(class = "sidebar-title", "Threshold"),
+                   threshold_sidebar_title("Threshold"),
                    selectInput(ns("threshold"), label = NULL,
-                               choices = THRESHOLD_CHOICES, 
+                               choices = THRESHOLD_CHOICES,
                                selected = DEFAULT_THRESHOLD),
                    
                    tags$hr(),

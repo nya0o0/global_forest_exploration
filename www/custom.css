@@ -179,12 +179,32 @@ body { background-color: #fafafa; }
   letter-spacing: 0.02em;
 }
 
-.sidebarPanel {
+/* Shiny renders sidebarPanel() as a form.well — target both .well
+   and our custom .sidebar-panel-like wrapper used in Ch.5
+   ranking tab where we use column() instead of sidebarPanel(). */
+.well,
+.sidebar-panel-like {
   background-color: #ffffff;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   padding: 1.2rem 1.1rem;
 }
+
+/* First sidebar-title in a panel should have no top margin */
+.well > .sidebar-title:first-child,
+.sidebar-panel-like > .sidebar-title:first-child {
+  margin-top: 0;
+}
+
+/* Threshold info icon nicely placed inside green section header */
+.sidebar-title .threshold-info { text-decoration: none; }
+.sidebar-title .threshold-info i.fa { color: #1f6f54; font-size: 0.9em; }
+
+/* Hide the now-empty default Shiny <label> nodes (label = NULL) so
+   they don't create vertical gaps in the sidebar */
+.well .shiny-input-container > label:empty,
+.sidebar-panel-like .shiny-input-container > label:empty { display: none; }
 
 /* Module 2 Selection Bar */
 .selectize-input {

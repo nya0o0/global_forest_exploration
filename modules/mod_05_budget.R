@@ -15,9 +15,14 @@ mod_05_budget_ui <- function(id) {
       tabPanel("Single country",
         sidebarLayout(
           sidebarPanel(width = 3,
-            selectInput(ns("country"), "Country", choices = NULL),
-            selectInput(ns("threshold"), threshold_label("Threshold"),
+            sidebar_title("Country"),
+            selectInput(ns("country"), label = NULL, choices = NULL),
+
+            threshold_sidebar_title("Threshold"),
+            selectInput(ns("threshold"), label = NULL,
                         choices = THRESHOLD_CHOICES, selected = DEFAULT_THRESHOLD),
+
+            tags$hr(),
             helpText("Removals are reported as a single annual average ",
                      "(data limitation), shown as a constant baseline.")
           ),
@@ -26,13 +31,18 @@ mod_05_budget_ui <- function(id) {
       ),
       tabPanel("Country ranking",
         fluidRow(
-          column(3,
-            sliderInput(ns("yrs"), "Average over years",
+          column(3, class = "sidebar-panel-like well",
+            sidebar_title("Average over years"),
+            sliderInput(ns("yrs"), label = NULL,
                         min = 2001, max = 2022, value = c(2018, 2022),
                         step = 1, sep = ""),
-            selectInput(ns("threshold2"), threshold_label("Threshold"),
+
+            threshold_sidebar_title("Threshold"),
+            selectInput(ns("threshold2"), label = NULL,
                         choices = THRESHOLD_CHOICES, selected = DEFAULT_THRESHOLD),
-            sliderInput(ns("topn"), "Top N",
+
+            sidebar_title("Top N"),
+            sliderInput(ns("topn"), label = NULL,
                         min = 5, max = 30, value = 15)
           ),
           column(9, plotlyOutput(ns("rank_plot"), height = "520px"))

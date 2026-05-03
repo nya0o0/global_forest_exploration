@@ -27,18 +27,24 @@ mod_03_loss_carbon_ui <- function(id) {
     ),
     sidebarLayout(
       sidebarPanel(width = 3,
-                   sliderInput(ns("year"), "Year",
+                   sidebar_title("Year"),
+                   sliderInput(ns("year"), label = NULL,
                                min = 2001, max = 2022, value = 2020, step = 1, sep = ""),
-                   selectInput(ns("threshold"), "Threshold",
-                               choices = c("30%" = 30, "50%" = 50, "75%" = 75),   # 删除了10%
-                               selected = 30),     
-                   radioButtons(ns("metric"), "Carbon metric (y-axis)",
+
+                   threshold_sidebar_title("Threshold"),
+                   selectInput(ns("threshold"), label = NULL,
+                               choices = c("30%" = 30, "50%" = 50, "75%" = 75),   # 10% 已移除
+                               selected = 30),
+
+                   sidebar_title("Carbon metric (y-axis)"),
+                   radioButtons(ns("metric"), label = NULL,
                                 choices = CARBON_METRICS, selected = "gross_emissions"),
-                   # ---- 新增：高亮组选择 ----
-                   selectInput(ns("highlight"), "Highlight group",
+
+                   sidebar_title("Highlight group"),
+                   selectInput(ns("highlight"), label = NULL,
                                choices = c("All countries", "Tropical only", "Non‑tropical only"),
                                selected = "All countries"),
-                   # ------------------------
+
                    checkboxInput(ns("logaxes"), "Log-scale both axes", TRUE),
                    checkboxInput(ns("trend"),   "Show OLS trend line", TRUE),
                    tags$hr(),

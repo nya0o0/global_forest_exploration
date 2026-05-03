@@ -13,16 +13,24 @@ mod_04_hotspots_ui <- function(id) {
     ),
     sidebarLayout(
       sidebarPanel(width = 3,
-                   selectInput(ns("country"), "Scope (Global or Country)", choices = NULL),
-                   sliderInput(ns("year"), "Year",
+                   sidebar_title("Scope (Global or Country)"),
+                   selectInput(ns("country"), label = NULL, choices = NULL),
+
+                   sidebar_title("Year"),
+                   sliderInput(ns("year"), label = NULL,
                                min = 2001, max = 2022, value = 2022, step = 1, sep = ""),
-                   selectInput(ns("threshold"), "Tree-cover threshold",
+
+                   threshold_sidebar_title("Tree-cover threshold"),
+                   selectInput(ns("threshold"), label = NULL,
                                choices = THRESHOLD_CHOICES, selected = DEFAULT_THRESHOLD),
-                   radioButtons(ns("metric"), "Map & Chart metric",
+
+                   sidebar_title("Map & Chart metric"),
+                   radioButtons(ns("metric"), label = NULL,
                                 choices = c("Tree-cover loss (ha)" = "tc_loss_ha",
                                             "Loss rate (% of 2000 extent)" = "loss_pct",
                                             "Gross emissions (Mg CO₂e)" = "gross_emissions",
                                             "Net flux (Mg CO₂e)" = "net_flux")),
+
                    tags$hr(),
                    helpText("👆 Tip: Switch to 'Loss rate (%)' to find regions losing forest at the fastest relative pace."),
                    helpText("🖱️ Click any region on the map to see its full 2001–2022 history below.")
