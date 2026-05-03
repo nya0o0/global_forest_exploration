@@ -147,6 +147,10 @@ forest-loss-shiny/
 
 ------------------------------------------------------------------------
 
-## 5. Citation
+## 5. AI Usage
+
+Generative AI are use in this project for formatting the plots and shiny app, also designing the initial structure of the repo, and the code is reviewed, modified, and validated by us.
+
+## 6. Citation
 
 > Hansen, M. C., et al. (2013). *Science* 342, 850–853. Harris, N. L., et al. (2021). *Nature Climate Change* 11, 234–240. Gibbs, D. A., et al. (2025). *Earth System Science Data* 17, 1217. [Group N] (2026). *Global Forest Tree Cover Loss & Carbon Flux Shiny App*. DASC 3240, HKUST.
