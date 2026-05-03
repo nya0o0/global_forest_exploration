@@ -35,8 +35,8 @@ mod_04_hotspots_ui <- function(id) {
                   column(6, plotlyOutput(ns("region_ts"), height = "260px"))),
                 insight_box("Insight",
                             HTML("Hotspots cluster heavily in Russia (Sakha, Krasnoyarsk, Irkutsk), Brazil (Para, Mato Grosso, Santa Cruz, Amazonas), 
-                            Canada (Saskatchewan, Alberta, British Columbia), and US (Alaska).<br>
-                            Notice how switching from absolute 'Tree-cover loss (ha)' to relative 'Loss rate (%)' 
+                                 Canada (Saskatchewan, Alberta, British Columbia), and US (Alaska).<br>
+                                 Notice how switching from absolute 'Tree-cover loss (ha)' to relative 'Loss rate (%)' 
                                  shifts the spotlight: some smaller provinces are being deforested at alarming speeds relative to 
                                  their baseline size, pushing their carbon flux deep into 'Net Source' territory."))
       )
@@ -47,12 +47,14 @@ mod_04_hotspots_ui <- function(id) {
 mod_04_hotspots_server <- function(id, subnat_joined) {
   moduleServer(id, function(input, output, session) {
     
+    # Dynamically populate the country dropdown based on available data
     observe({
       ctry <- sort(unique(subnat_joined$country))
       choices_list <- c("🌍 Global View", ctry)
       updateSelectInput(session, "country", choices = choices_list, selected = "🌍 Global View")
     })
     
+    # Fetch spatial polygons (sf object) based on the selected scope
     polys <- reactive({
       req(input$country)
       if (input$country == "🌍 Global View") {
@@ -64,6 +66,7 @@ mod_04_hotspots_server <- function(id, subnat_joined) {
       sf
     })
     
+    # Filter and prepare the dataset based on user inputs (year, threshold, country)
     map_df <- reactive({
       req(input$country)
       d <- subnat_joined %>%
@@ -76,14 +79,17 @@ mod_04_hotspots_server <- function(id, subnat_joined) {
       d
     })
     
+    # Render the interactive Leaflet map
     output$map <- renderLeaflet({
       shp <- polys()
       d <- map_df()
       req(nrow(d) > 0)
       
+      # Identify appropriate column names for region and country from the sf object
       name_col <- intersect(c("name_en", "name", "gn_name", "woe_name"), names(shp))[1]
       admin_col <- intersect(c("admin", "sovereignt", "geounit"), names(shp))[1]
       
+      # Helper function to standardize subnational names to ensure a successful join
       clean_name <- function(x) {
         x <- tolower(as.character(x))
         x <- gsub("['`’]", "", x)                  
@@ -91,22 +97,26 @@ mod_04_hotspots_server <- function(id, subnat_joined) {
         x <- gsub(" republic| oblast| krai| province| state| region| autonomous okrug| okrug | autonomous| uygur| zhuang| hui", "", x)
         trimws(x)}
       
+      # Helper function to standardize specific country names
       clean_country <- function(x) {
         x <- as.character(x)
         x[x == "United States of America"] <- "United States"
         x[x == "Russian Federation"] <- "Russia"
         x}
       
+      # Apply cleaning functions to create matching keys
       shp$.subnat_match <- clean_name(shp[[name_col]])
       shp$.country_match <- clean_country(shp[[admin_col]])
       shp$.layer_id <- paste(shp$.country_match, shp$.subnat_match, sep = "||")
       
       d <- d %>% mutate(.layer_id = paste(country, clean_name(subnational1), sep = "||"))
       
+      # Join the spatial data with the forest metrics
       shp <- shp %>%
         dplyr::left_join(d %>% select(.layer_id, value = !!sym(input$metric), original_name = subnational1) %>%
                            distinct(.layer_id, .keep_all = TRUE), by = ".layer_id", relationship = "many-to-many")
       
+      # Define color palettes based on the selected metric
       if (input$metric == "net_flux") {
         pal <- leaflet::colorNumeric("RdYlBu", domain = shp$value, reverse = TRUE, na.color = "transparent")
       } else {
@@ -119,6 +129,7 @@ mod_04_hotspots_server <- function(id, subnat_joined) {
                                     "Gross emissions" = "gross_emissions",
                                     "Net flux" = "net_flux") == input$metric))
       
+      # Build the final Leaflet map with polygons and tooltips
       leaflet(shp) %>%
         addProviderTiles(providers$CartoDB.Positron) %>%
         addPolygons(fillColor = ~pal(value), weight = 0.5, color = "#999",
@@ -130,12 +141,15 @@ mod_04_hotspots_server <- function(id, subnat_joined) {
         addLegend(pal = pal, values = shp$value, title = metric_label, position = "bottomright")
     })
     
+    # Capture map clicks to update the time series chart
     clicked_region <- reactiveVal(NULL)
     observeEvent(input$map_shape_click, { clicked_region(input$map_shape_click$id) })
     
+    # Render the Top 10 ranking horizontal bar chart
     output$top_rank <- renderPlotly({
       metric_sym <- input$metric
       
+      # Aggregate data to find the top 10 regions
       d <- map_df() %>%
         group_by(country, subnational1) %>%
         summarise(metric_val = mean(!!sym(metric_sym), na.rm = TRUE), .groups = "drop") %>%
@@ -143,12 +157,14 @@ mod_04_hotspots_server <- function(id, subnat_joined) {
         arrange(desc(metric_val)) %>%
         slice_head(n = 10)
       
+      # Append country abbreviations in Global View for clarity
       if (input$country == "🌍 Global View") {
         d <- d %>% mutate(label_name = paste0(subnational1, " (", substr(country, 1, 3), ")"))
       } else {
         d <- d %>% mutate(label_name = subnational1)
       }
       
+      # Prepare factors for proper ordering in ggplot and format hover text
       d <- d %>%
         mutate(
           label_name = forcats::fct_reorder(label_name, metric_val),
@@ -156,6 +172,7 @@ mod_04_hotspots_server <- function(id, subnat_joined) {
       
       validate(need(nrow(d) > 0, "No data to rank."))
       
+      # Generate the bar chart
       g <- ggplot(d, aes(x = metric_val, y = label_name, fill = metric_val, text = hover_text)) +
         geom_col() + 
         scale_fill_viridis_c(option = "rocket", direction = -1, guide = "none") +
@@ -167,14 +184,17 @@ mod_04_hotspots_server <- function(id, subnat_joined) {
       to_plotly(g, tooltip = "text")
     })
     
+    # Render the time series trend line for the region clicked on the map
     output$region_ts <- renderPlotly({
       r_id <- clicked_region()
       validate(need(!is.null(r_id), "👈 Click a region on the map to see its timeline."))
       
+      # Extract country and subnational identifiers from the clicked layer ID
       parts <- strsplit(r_id, "\\|\\|")[[1]]
       c_click <- parts[1]
       s_click_clean <- parts[2]
       
+      # Re-declare cleaning function to ensure consistent matching for the time series
       clean_name <- function(x) {
         x <- tolower(as.character(x))
         x <- gsub("['`’]", "", x)
@@ -182,6 +202,7 @@ mod_04_hotspots_server <- function(id, subnat_joined) {
         x <- gsub(" republic| oblast| krai| province| state| region| autonomous okrug| okrug | autonomous| uygur| zhuang| hui", "", x)
         trimws(x)}
       
+      # Filter historical data for the selected region
       ts <- subnat_joined %>%
         filter(country == c_click, clean_name(subnational1) == s_click_clean, threshold == as.integer(input$threshold)) %>%
         mutate(
@@ -190,6 +211,7 @@ mod_04_hotspots_server <- function(id, subnat_joined) {
       
       validate(need(nrow(ts) > 0, "No temporal data available for this region."))
       
+      # Generate the time series bar chart with a trend line
       display_name <- ts$subnational1[1]
       
       g <- ggplot(ts, aes(x = year, y = !!sym(input$metric))) +
