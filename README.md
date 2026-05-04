@@ -25,7 +25,7 @@ install.packages("rnaturalearthhires",
 
 # Run directly from GitHub
 
-shiny::runGitHub("global_forest_exploration", "<nya0o0>", ref = "main")
+shiny::runGitHub("global_forest_exploration", "nya0o0", ref = "main")
 ```
 
 ## 1. Research question
