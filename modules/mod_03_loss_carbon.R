@@ -15,8 +15,8 @@ TROPICAL_COUNTRIES <- c(
   "Haiti", "Jamaica", "Sri Lanka", "Bangladesh", "Benin", "Togo",
   "Equatorial Guinea", "Sao Tome and Principe", "Maldives", "Seychelles",
   "Mauritius", "Fiji", "Solomon Islands", "Vanuatu", "Belize"
-  
 )
+
 mod_03_loss_carbon_ui <- function(id) {
   ns <- NS(id)
   fluidPage(
@@ -30,15 +30,13 @@ mod_03_loss_carbon_ui <- function(id) {
                    sliderInput(ns("year"), "Year",
                                min = 2001, max = 2022, value = 2020, step = 1, sep = ""),
                    selectInput(ns("threshold"), "Threshold",
-                               choices = c("30%" = 30, "50%" = 50, "75%" = 75),   # 删除了10%
-                               selected = 30),     
+                               choices = c("30%" = 30, "50%" = 50, "75%" = 75),
+                               selected = 30),
                    radioButtons(ns("metric"), "Carbon metric (y-axis)",
                                 choices = CARBON_METRICS, selected = "gross_emissions"),
-                   # ---- 新增：高亮组选择 ----
                    selectInput(ns("highlight"), "Highlight group",
                                choices = c("All countries", "Tropical only", "Non‑tropical only"),
                                selected = "All countries"),
-                   # ------------------------
                    checkboxInput(ns("logaxes"), "Log-scale both axes", TRUE),
                    checkboxInput(ns("trend"),   "Show OLS trend line", TRUE),
                    tags$hr(),
@@ -49,7 +47,8 @@ mod_03_loss_carbon_ui <- function(id) {
                 insight_box("Insight 1", 
                             "Annual tree-cover loss is positively and significantly associated with annual gross forest carbon emissions, especially in tropical countries. The highlighted group makes this regional contrast immediately visible."),
                 insight_box("Insight 2", 
-                            "From 2011 to 2022, the Pearson correlation between annual tree‑cover loss and net flux across all countries slighly decreased, implying that global forest carbon balance is being shaped by an increasingly complex set of factors beyond loss alone."),           insight_box("Insight 3", 
+                            "From 2011 to 2022, the Pearson correlation between annual tree‑cover loss and net flux across all countries slightly decreased, implying that global forest carbon balance is being shaped by an increasingly complex set of factors beyond loss alone."),
+                insight_box("Insight 3", 
                             "Indonesia consistently showed the highest net flux, primarily because its high tree‑cover loss leads to elevated gross emissions, while its gross removals remain comparatively low."),
                 insight_box("Insight 4", 
                             "Russia showed the lowest net flux, likely because it possesses the world’s largest forest cover, enabling massive gross removals that substantially outweigh its gross emissions.")
@@ -57,10 +56,11 @@ mod_03_loss_carbon_ui <- function(id) {
     )
   )
 }
+
 mod_03_loss_carbon_server <- function(id, country_joined) {
   moduleServer(id, function(input, output, session) {
     
-    # 将热带国家列表直接放在模块内，避免外部依赖
+    # 热带国家列表（小写）
     tropical_list <- tolower(c(
       "Brazil", "Indonesia", "Democratic Republic of the Congo", "Colombia",
       "Peru", "Malaysia", "Papua New Guinea", "Madagascar", "Cameroon",
@@ -76,6 +76,7 @@ mod_03_loss_carbon_server <- function(id, country_joined) {
       "Mauritius", "Fiji", "Solomon Islands", "Vanuatu", "Belize"
     ))
     
+    # 准备数据（过滤 + 高亮标记）
     df_year <- reactive({
       d <- country_joined %>%
         filter(year == input$year,
@@ -84,10 +85,8 @@ mod_03_loss_carbon_server <- function(id, country_joined) {
                !is.na(.data[[input$metric]])) %>%
         mutate(metric_value = .data[[input$metric]])
       
-      # 创建一个可用于匹配的小写国家列
       d <- d %>% mutate(country_lower = tolower(trimws(country)))
       
-      # 根据下拉框标记高亮组
       if (input$highlight == "All countries") {
         d <- d %>% mutate(highlight = TRUE)
       } else if (input$highlight == "Tropical only") {
@@ -98,7 +97,7 @@ mod_03_loss_carbon_server <- function(id, country_joined) {
       d
     })
     
-    # 调试输出：显示匹配数量
+    # 调试输出（可选，不显示在 UI，仅供控制台）
     output$debug_highlight <- renderPrint({
       d <- df_year()
       n_high <- sum(d$highlight)
@@ -109,22 +108,41 @@ mod_03_loss_carbon_server <- function(id, country_joined) {
       }
     })
     
+    # ============================================================
+    # 相关系数计算（直接内嵌，不再依赖外部函数 loss_carbon_corr）
+    # ============================================================
     output$corr_text <- renderText({
       d <- df_year()
+      # 基于高亮组筛选
       if (input$highlight != "All countries") {
         d <- d %>% filter(highlight)
       }
-      r <- loss_carbon_corr(d, input$year, as.integer(input$threshold))
-      if (is.na(r)) return("Pearson r: not enough data in highlighted group")
+      
+      # 检查数据量
+      if (nrow(d) < 3) {
+        return("Pearson r: not enough data in highlighted group")
+      }
+      
+      # 计算 Pearson 相关系数（使用 loss 和当前 metric_value）
+      r <- cor(d$tc_loss_ha, d$metric_value, use = "complete.obs")
+      
+      if (is.na(r)) {
+        return("Pearson r: could not compute (check for constant values?)")
+      }
+      
+      # 获取指标显示名称
+      metric_label <- names(CARBON_METRICS)[CARBON_METRICS == input$metric]
+      
       group_label <- switch(input$highlight,
                             "Tropical only" = "Tropical countries",
                             "Non‑tropical only" = "Non‑tropical countries",
                             "All countries" = "all countries")
+      
       sprintf("Pearson r (loss × %s) in %s = %.2f",
-              names(CARBON_METRICS)[CARBON_METRICS == input$metric],
-              group_label, r)
+              metric_label, group_label, r)
     })
     
+    # 气泡散点图
     output$scatter <- renderPlotly({
       d <- df_year()
       validate(need(nrow(d) > 0, "No data for this combination."))
@@ -135,12 +153,10 @@ mod_03_loss_carbon_server <- function(id, country_joined) {
       
       metric_label <- names(CARBON_METRICS)[CARBON_METRICS == input$metric]
       
-      # 创建用于颜色映射的“显示洲”：
-      # 非高亮 → "Other", 高亮 → continent
+      # 颜色映射：高亮 -> 原 continent；非高亮 -> "Other"
       d <- d %>%
         mutate(continent_display = if_else(highlight, as.character(continent), "Other"))
       
-      # 固定颜色映射：原有 continent 调色板 + "Other" = grey
       all_continents <- c(unique(d$continent), "Other")
       color_map <- PALETTE_REGION[names(PALETTE_REGION) %in% all_continents]
       color_map["Other"] <- "grey80"
@@ -152,7 +168,7 @@ mod_03_loss_carbon_server <- function(id, country_joined) {
                                        "Loss: ", scales::comma(round(tc_loss_ha)), " ha<br>",
                                        metric_label, ": ",
                                        scales::comma(round(metric_value))))) +
-        geom_point(alpha = ifelse(d$highlight, 0.85, 0.3)) +  # 透明度通过向量控制
+        geom_point(alpha = ifelse(d$highlight, 0.85, 0.3)) +
         scale_size_area(max_size = 14, labels = fmt_si, name = "Forest 2000 (ha)") +
         scale_colour_manual(values = color_map, name = "Continent") +
         labs(title = paste0("Forest loss vs. ", metric_label, " · ", input$year,
